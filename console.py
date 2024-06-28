@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] == '{' and pline[-1] =='}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -114,34 +114,34 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        args =args.split(" ")[0]
-        """ Create an object of any class"""
-        if not args:
+        argss=args.split()
+        
+        if len(argss)== 0:
             print("** class name missing **")
             return
-        if args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        kwargs = {}
-        commands = args.split(" ")
-        if i in range(1, len(commands)):
-            key = commands[i].split("=")[0]
-            value = commands[i].split("=")[1]
-            if value.startswith('"'):
-                value = value.strip('"').replace("_", " ")
-            else:
-                try:
-                    value = eval(value)
-                except (SyntaxError, NameError):
-                    pass
-            kwargs[key] = value
         
-
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
-
+        class_name = argss[0]
+        if class_name not in HBNBCommand.classes:
+            print("** class doesn't exist**")
+            return
+        
+        new_instance = HBNBCommand.classes[class_name]()
+        
+        for pmeters in argss[1:]:
+            key, value = pmeters.split("=")
+            try:
+                value = value.strip('\"').replace('_', ' ')
+            except:
+        # Try to convert the value to int or float if possible
+                try:
+                    if '.' in value:
+                        value = float(value)
+                    else:
+                        value = int(value)
+                except ValueError:
+                    pass
+        
+            setattr(new_instance, key, value)        
     def help_create(self):
         """ Help information for the create method """
         print("Creates a class of any type")
@@ -288,7 +288,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] is '\"':  # check for quoted arg
+            if args and args[0] == '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -296,10 +296,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] is not ' ':
+            if not att_name and args[0] != ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] is '\"':
+            if args[2] and args[2][0] == '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
