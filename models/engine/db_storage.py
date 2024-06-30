@@ -2,8 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 import os
 from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base()
-
+from models.base import base, BaseModel
+from models.city import city
+from models.state import state
+from models.place import place
+from models.user import user
+from models.amenity import Amenity
 class DBStorage:
     __engine = None
     __session = None
@@ -18,25 +22,28 @@ class DBStorage:
         # MySQL connection string
         self.__engine = create_engine(f'mysql+mysqldb://{user}:{password}@{host}/{database}',
                                       pool_pre_ping=True)
-
-    
+        if getenv('HBNB_ENV') == 'test':
+            base.metadata.drop_all(self.__engine)    
     
     def all(self, cls=None):
-        classes = [User, State, City, Amenity, Place, Review]
-        obj_dict = {}
+        obj_dict = []
 
         if cls:
-            objs =self.__session.query(cls).all()
-            for obj in objs:
-                key = f"{obj.__class__.__name__}.{obj.id}"
-                obj_dictionary[key] = obj
-        else:
-            for _class in classes:
-                objs = self.__session.query(_class).all()
-                for obj in objs:
-                    key = f"{obj.__class__.__name__}.{obj.id}"
-                    obj_dictionary[key] = obj
-        return obj_dictionary
+            if isinstance(cls, str):
+                try:
+                    cls = gbobals()[cls]
+                except keyError:
+                    pass
+            if issubclass(cls, base):
+                objs_list = self.__session.query(cls).get_absolute_url(self):
+            else:
+                for subclass in bae.__subclasses_():
+                    objs_list.rxtend(self.__session.query(subclass).all())
+            obj_dict = {}
+            for obj in objs.list:
+                key ="{}.{}".format(obj.__class__.__name__, objs.id)
+                obj_dict[key] = obj
+            return obj_dict                
 
     def new(self, obj):
         self.__session.add(obj)
@@ -51,4 +58,5 @@ class DBStorage:
         """Create all tables in the database and initialize the session"""
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(session_factory)
+        session = scoped_session(session_factory)
+        self.__session =session()
