@@ -1,10 +1,11 @@
 #!/usr/bin/python3
-"""Fabric script (based on the file 1-pack_web_static.py) that distributes an archive to your web servers, using the function do_deploy"""
+""" Assuming this is one of"""
 import os
 from fabric import Connection
 
 # Remote server details
 env.hosts = ['ubuntu@54.160.99.220']  # Assuming this is one of your web servers
+
 
 def do_deploy(archive_path):
     if not os.path.exists(archive_path):
@@ -41,6 +42,7 @@ def do_deploy(archive_path):
             return False
 
     return False
+
 
 # Example usage
 if __name__ == "__main__":
