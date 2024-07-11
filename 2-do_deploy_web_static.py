@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-# This Fabric script distributes an archive to web servers and sets up the static content.
+'''his Fabric script distributes an archive to web servers and sets up the static content'''
 """ Assuming this is one of"""
 """import statement"""
-import 1-pack_web_static
+import 1-pack_web_static.py
 import os
 from fabric import Connection
 
