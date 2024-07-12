@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""upload the archive to /tmp/ directory on the server"""
+#upload the archive to /tmp/ directory on the server
 import os
 from fabric import Connection
 from 1-pack_web_static import archive_path
