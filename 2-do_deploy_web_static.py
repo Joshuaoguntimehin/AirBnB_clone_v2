@@ -1,56 +1,53 @@
 #!/usr/bin/python3
-'''This Fabric script distributes an archive to web servers and sets up the web servers for deployment'''
-
+"""upload the archive to /tmp/ directory on the server"""
 import os
-from fabric import Connection, task
-from 1-pack_web_static import do_pack
-
-env.hosts = ['ubuntu@34.207.58.74', 'ubuntu@54.160.99.220']
+from fabric import Connection
+from 1-pack_web_static import archive_path
+# Remote server details
+env.hosts = ['ubuntu@54.160.99.220']  # Assuming this is one of your web servers
 
 def do_deploy(archive_path):
     if not os.path.exists(archive_path):
-        return False
-    
-    try:
-        # Extract the archive filename and name without extension
-        archive_name = os.path.basename(archive_path)
-        archive_filename_no_ext = os.path.splitext(archive_name)[0]
-        release_folder = f"/data/web_static/releases/{archive_filename_no_ext}"
-
-        # Loop through each server and perform operations
-        for host in env.hosts:
-            conn = Connection(host)
-            
-            # Upload the archive to /tmp/ directory on the web server
-            conn.put(archive_path, remote='/tmp/')
-            
-            # Uncompress the archive to the release folder
-            conn.run(f'mkdir -p {release_folder}')
-            conn.run(f'tar -xzf /tmp/{archive_name} -C {release_folder}')
-            
-            # Remove the archive from the web server
-            conn.run(f'rm /tmp/{archive_name}')
-            
-            # Move contents out of the web_static directory
-            conn.run(f'mv {release_folder}/web_static/* {release_folder}/')
-            conn.run(f'rm -rf {release_folder}/web_static')
-            
-            # Delete the symbolic link /data/web_static/current
-            conn.run('rm -rf /data/web_static/current')
-            
-            # Create a new symbolic link
-            conn.run(f'ln -s {release_folder} /data/web_static/current')
-        
-        return True
-    except Exception as e:
-        print(f"Error: {e}")
+        print(f"Archive file {archive_path} not found.")
         return False
 
-@task
-def deploy(c):
-    """ Function to pack and deploy the web_static content """
-    archive_path = do_pack()
-    if not archive_path:
-        return False
-    return do_deploy(archive_path)
+    # Upload the archive to /tmp/ directory on the server
+    remote_path = '/tmp/'
+    with Connection(env.hosts[0]) as conn:
+        conn.put(archive_path, remote=remote_path)
+
+        # Get the filename without extension
+        archive_filename = os.path.basename(archive_path).replace('.tgz', '').replace('.tar.gz', '')
+
+        # Uncompress the archive to /data/web_static/releases/<archive filename without extension>
+        release_path = f'/data/web_static/releases/{archive_filename}/'
+        conn.run(f'mkdir -p {release_path}')
+        conn.run(f'tar -xzvf {remote_path}{archive_filename}.tar.gz -C {release_path}')
+
+        # Delete the archive from the server
+        conn.run(f'rm {remote_path}{archive_filename}.tar.gz')
+
+        # Delete the symbolic link /data/web_static/current if it exists
+        conn.sudo(f'rm -rf /data/web_static/current')
+
+        # Create a new symbolic link
+        conn.sudo(f'ln -s {release_path} /data/web_static/current')
+
+        # Check if the symbolic link is created successfully
+        result = conn.run('test -L /data/web_static/current && echo "True" || echo "False"')
+        if result.stdout.strip() == "True":
+            return True
+        else:
+            return False
+
+    return False
+
+# Example usage
+if __name__ == "__main__":
+    archive_path = '/path/to/your/archive.tar.gz'
+    result = do_deploy(archive_path)
+    if result:
+        print("Deployment successful.")
+    else:
+        print("Deployment failed.")
 
