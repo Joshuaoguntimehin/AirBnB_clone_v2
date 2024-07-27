@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """import statement"""
-from flask import Flask, escape
+from flask import Flask
 
 """app definition"""
 app = Flask(__name__)
