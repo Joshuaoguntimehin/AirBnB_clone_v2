@@ -12,6 +12,7 @@ app = Flask(__name__)
 def hello_hbnb():
     return "Hello HBNB!"
 
+
 """Displays 'HBNB' when accessed."""
 
 
@@ -19,7 +20,8 @@ def hello_hbnb():
 def hbnb():
     return "HBNB"
 
-"""Displays 'C ' followed by the text variable with underscores replaced by spaces."""
+
+"""Displays 'C ' followed by the text variable with underscores"""
 
 
 @app.route('/c/<text>', strict_slashes=False)
@@ -27,7 +29,8 @@ def c_text(text):
     text = text.replace('_', ' ')
     return f"C {escape(text)}"
 
-"""Displays 'Python ' followed by the text variable with underscores replaced by spaces.
+
+"""Displays 'Python ' followed by the text variable with
 Defaults to 'is cool' if no text is provided."""
 
 
@@ -37,6 +40,6 @@ def python_text(text):
     text = text.replace('_', ' ')
     return f"Python {escape(text)}"
 
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
-
