@@ -1,15 +1,23 @@
+#!/usr/bin/python3
+"""import statement"""
 from flask import Flask, render_template_string
 import re
 
 app = Flask(__name__)
+"""/hbnb returns "HBNB" """
+
 
 @app.route('/', strict_slashes=False)
 def hello():
     return "Hello HBNB!"
+"""/hbnb returns "HBNB"""
+
 
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
     return "HBNB"
+"""/c/<text> replaces underscores with spaces in the text and returns "C """
+
 
 @app.route('/c/<text>', strict_slashes=False)
 def c_text(text):
