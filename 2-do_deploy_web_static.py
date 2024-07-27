@@ -1,53 +1,42 @@
 #!/usr/bin/python3
-#upload the archive to /tmp/ directory on the server
+"""import statement"""
+from 1-pack_web_static.py import archive_path, connection, run
 import os
-from fabric import Connection
-from 1-pack_web_static import archive_path
-# Remote server details
-env.hosts = ['ubuntu@54.160.99.220']  # Assuming this is one of your web servers
+
 
 def do_deploy(archive_path):
     if not os.path.exists(archive_path):
-        print(f"Archive file {archive_path} not found.")
         return False
+    else:
+        return True
 
-    # Upload the archive to /tmp/ directory on the server
+    """ Upload the archive to /tmp/ directory on the server"""
+    host = ubuntu@54.160.99.220
     remote_path = '/tmp/'
-    with Connection(env.hosts[0]) as conn:
+    with connection(env.host[0])as conn:
         conn.put(archive_path, remote=remote_path)
-
-        # Get the filename without extension
-        archive_filename = os.path.basename(archive_path).replace('.tgz', '').replace('.tar.gz', '')
-
-        # Uncompress the archive to /data/web_static/releases/<archive filename without extension>
+        """ Uncompress the archive to /data/web_static/releases/
+        <archive filename without extension>"""
         release_path = f'/data/web_static/releases/{archive_filename}/'
         conn.run(f'mkdir -p {release_path}')
-        conn.run(f'tar -xzvf {remote_path}{archive_filename}.tar.gz -C {release_path}')
+        conn.run(f'tar - xzvf {remote_path}{archive_filename}.tar.gz
+                -C {release_path}')
 
-        # Delete the archive from the server
+        """ Delete the archive from the server"""
         conn.run(f'rm {remote_path}{archive_filename}.tar.gz')
 
-        # Delete the symbolic link /data/web_static/current if it exists
+
+        """ Delete the symbolic link /data/web_static/current if it exists"""
         conn.sudo(f'rm -rf /data/web_static/current')
 
-        # Create a new symbolic link
+        """ Create a new symbolic link"""
         conn.sudo(f'ln -s {release_path} /data/web_static/current')
 
-        # Check if the symbolic link is created successfully
+         """ Check if the symbolic link is created successfully"""
         result = conn.run('test -L /data/web_static/current && echo "True" || echo "False"')
         if result.stdout.strip() == "True":
             return True
         else:
             return False
 
-    return False
-
-# Example usage
-if __name__ == "__main__":
-    archive_path = '/path/to/your/archive.tar.gz'
-    result = do_deploy(archive_path)
-    if result:
-        print("Deployment successful.")
-    else:
-        print("Deployment failed.")
 
