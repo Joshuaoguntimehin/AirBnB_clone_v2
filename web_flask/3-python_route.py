@@ -3,14 +3,20 @@
 from flask import Flask
 
 app = Flask(__name__)
+"""/hbnb returns "HBNB" """
+
 
 @app.route('/', strict_slashes=False)
 def hello():
     return "Hello HBNB!"
+"""/hbnb returns "HBNB"""
+
 
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
     return "HBNB"
+"""/c/<text> replaces underscores with spaces in the text and returns "C """
+
 
 @app.route('/c/<text>', strict_slashes=False)
 def c_text(text):
@@ -23,8 +29,5 @@ def c_text(text):
 def python_text(text):
     # Replace underscores with spaces
     text = text.replace('_', ' ')
-    return f"Python {text}"`
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    return f"Python {text}"
 
