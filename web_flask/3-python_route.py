@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """import statement"""
-from flask import Flask
+from flask import Flask, escape
 
 """app definition"""
 app = Flask(__name__)
@@ -34,7 +34,7 @@ def c_text(text):
 """ which sets the text variable to its default value "is cool"""
 
 
-@app.route('/python/', defaults={'text': 'is cool'}, strict_slashes=False)
+@app.route('/python/', defaults={'text'= 'is cool'}, strict_slashes=False)
 @app.route('/python/<text>', strict_slashes=False)
 def python_text(text):
     text = text.replace('_' ' ')
