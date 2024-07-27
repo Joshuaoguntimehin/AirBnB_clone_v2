@@ -28,7 +28,7 @@ def hbnb():
 def c_text(text):
     # Replace underscores with spaces
     text = text.replace('_', ' ')
-    return f"C {escape(text)}"
+    return f"C {text}"
 
 
 """ which sets the text variable to its default value "is cool"""
@@ -38,7 +38,7 @@ def c_text(text):
 @app.route('/python/<text>', strict_slashes=False)
 def python_text(text):
     text = text.replace('_' ' ')
-    return f"python {escape(text)}"
+    return f"python {text}"
 
 
 if __name__ == "__main__":
