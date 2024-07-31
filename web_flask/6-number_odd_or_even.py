@@ -49,7 +49,7 @@ def number(n):
            strict_slashes=False)
 def number_template(n):
     return f"{n}"
-
+"""Module is documented"""
 @app.route('/number_template/<int:n>', strict_slashes=False)
 @app.route('/number_template/',
            defaults={'n': 'templates/6-number_odd_or_even.html'},
